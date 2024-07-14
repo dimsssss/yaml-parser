@@ -27,7 +27,6 @@ challenge:
 }
 ```
 
-
 ### number
 ```yaml
 number: 1
@@ -52,18 +51,6 @@ isNotGood: false
   "isNotGood": false
 }
 ```
-### boolean
-
-```yaml
-isGood: true
-isNotGood: false
-```
-```json
-{
-  "isGood": true,
-  "isNotGood": false
-}
-```
 
 ### null
 ```yaml
@@ -82,7 +69,6 @@ message: >
   this is an example
   yaml parser
 ```
-
 ```json
 {
   "message": "this is an example\nyaml parser"
