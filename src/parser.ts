@@ -61,11 +61,14 @@ export class Parser {
         root.push([newObject, token.key, token]);
         continue;
       } else if (this.isValue(token)) {
-        parent[prevKey] += token.originalValue;
+        parent[prevKey] = [
+          parent[prevKey].trim(),
+          token.originalValue.trim(),
+        ].join(' ');
       } else if (this.isNumber(token)) {
         parent[token.key] = Number(token.value);
       } else if (this.isBoolean(token)) {
-        parent[token.key] = Boolean(token.value);
+        parent[token.key] = token.value === 'true';
       } else if (this.isNull(token)) {
         parent[token.key] = null;
       } else if (this.isPipeString(token) || this.isConcatString(token)) {
