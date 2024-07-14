@@ -1,0 +1,15 @@
+name: YAML Parser
+spec:
+  name: 
+  type: good
+  boolean:     true
+  level: 
+    beginner: 1
+    nulltype: null
+    message: >
+      this is an example from
+      the YAML parser
+      that spans more than
+      one line
+  status: good
+nice: nice
