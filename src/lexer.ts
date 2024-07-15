@@ -4,7 +4,11 @@ export class Token {
     private readonly _originalValue: string,
     private readonly _key: string,
     private readonly _value: string,
-  ) {}
+    private readonly _line: number,
+  ) {
+    this._key = _key.replaceAll(' ', '');
+    this._value = _value.replaceAll(' ', '');
+  }
 
   get originalKey() {
     return this._originalKey;
@@ -24,6 +28,10 @@ export class Token {
 
   get depth() {
     return this._originalKey.split('  ').length;
+  }
+
+  get line() {
+    return this._line;
   }
 }
 
@@ -63,19 +71,14 @@ export class Lexer {
       .split('\n')
       .map((str: string) => str.split(':'))
       .filter((value: string[]) => !(value.length === 1 && !value[0]))
-      .map((chunk) => {
+      .map((chunk, index) => {
         const [key, value] = chunk;
 
         if (chunk.length === 1) {
-          return new Token('', key, '', key.replaceAll(' ', ''));
+          return new Token('', key, '', key, index + 1);
         }
 
-        return new Token(
-          key,
-          value,
-          key.replaceAll(' ', ''),
-          value.replaceAll(' ', ''),
-        );
+        return new Token(key, value, key, value, index + 1);
       });
   }
 }
