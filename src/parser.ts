@@ -1,83 +1,50 @@
 import { Token } from './lexer';
+import { TypeConverter } from './TypeConverter';
+import { YamlGraph } from './YamlGraph';
 
 export class Parser {
+  typeConverter = new TypeConverter();
+  yamlGraph = new YamlGraph([[{}, '', new Token('', '', '', '', 0)]]);
+
   constructor(private readonly tokens: Token[]) {}
 
-  private flatDepth(
-    parsedType: [[Record<string, any>, string, Token]],
-    token: Token,
-  ) {
-    while (parsedType.length > token.depth) {
-      parsedType.pop();
-    }
-  }
-
-  private isObject(token: Token) {
-    return token.key && !token.value;
-  }
-
-  private isValue(token: Token) {
-    return !token.key && token.value;
-  }
-
-  private isNumber(token: Token) {
-    return !isNaN(Number(token.value));
-  }
-
-  private isBoolean(token: Token) {
-    return token.value === 'true' || token.value === 'false';
-  }
-
-  private isNull(token: Token) {
-    return token.value === 'null';
-  }
-
-  // string end with \n
-  private isPipeString(token: Token) {
-    return token.value === '|';
-  }
-
-  // string end without \n
-  private isConcatString(token: Token) {
-    return token.value === '>';
-  }
-
   parse() {
-    const root: [[Record<string, any>, string, Token]] = [
-      [{}, '', new Token('', '', '', '')],
-    ];
-
     for (const token of this.tokens) {
-      if (token.key) {
-        this.flatDepth(root, token);
-      }
+      this.yamlGraph.flatDepth(token);
 
-      const last = root.length - 1;
-      const [parent, prevKey] = root[last];
-
-      if (this.isObject(token)) {
-        const newObject = {};
-        parent[token.key] = newObject;
-        root.push([newObject, token.key, token]);
-        continue;
-      } else if (this.isValue(token)) {
-        parent[prevKey] = [
-          parent[prevKey].trim(),
-          token.originalValue.trim(),
-        ].join(' ');
-      } else if (this.isNumber(token)) {
-        parent[token.key] = Number(token.value);
-      } else if (this.isBoolean(token)) {
-        parent[token.key] = token.value === 'true';
-      } else if (this.isNull(token)) {
-        parent[token.key] = null;
-      } else if (this.isPipeString(token) || this.isConcatString(token)) {
-        root[last][1] = token.key;
-        parent[token.key] = '';
+      if (this.typeConverter.isObject(token.key, token.value)) {
+        this.yamlGraph.addNode(token);
+      } else if (this.typeConverter.isValue(token.key, token.value)) {
+        const str = this.typeConverter.concatString(
+          this.yamlGraph.getLastedInsertedValue(),
+          token,
+        );
+        this.yamlGraph.addValueToLastNode(str);
+      } else if (this.typeConverter.isNumber(token.value)) {
+        this.yamlGraph.addValue(
+          this.typeConverter.toNumber(token.value),
+          token,
+        );
+      } else if (this.typeConverter.isBoolean(token.value)) {
+        this.yamlGraph.addValue(
+          this.typeConverter.toBoolean(token.value),
+          token,
+        );
+      } else if (this.typeConverter.isNull(token.value)) {
+        this.yamlGraph.addValue(this.typeConverter.toNull(), token);
+      } else if (
+        this.typeConverter.isPipeString(token.value) ||
+        this.typeConverter.isConcatString(token.value)
+      ) {
+        this.yamlGraph.modifyLastNodeKey(token);
+        this.yamlGraph.addValue('', token);
       } else {
-        parent[token.key] = token.originalValue.trim();
+        this.yamlGraph.addValue(
+          this.typeConverter.toString(token.originalValue),
+          token,
+        );
       }
     }
-    return root[0][0];
+    return this.yamlGraph.get();
   }
 }
