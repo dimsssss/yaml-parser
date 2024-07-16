@@ -1,6 +1,6 @@
 import fs from 'fs/promises';
-import { Lexer } from '../src/lexer';
-import { Parser } from '../src/parser';
+import { Lexer } from '../src/Lexer';
+import { Parser } from '../src/Parser';
 
 describe('parser test', () => {
   let objectYaml;
@@ -9,6 +9,8 @@ describe('parser test', () => {
   let nullYaml;
   let concatStringYaml;
   let stringYaml;
+  let arrayYaml;
+  let arrayValueYaml;
 
   beforeAll(async () => {
     const [
@@ -18,6 +20,8 @@ describe('parser test', () => {
       nullBuffer,
       concatStringBuffer,
       stringBuffer,
+      arrayBuffer,
+      arrayValueBuffer,
     ] = await Promise.all([
       fs.readFile('tests/file/parser/object-parser.yaml', 'utf8'),
       fs.readFile('tests/file/parser/number-parser.yaml', 'utf8'),
@@ -25,6 +29,8 @@ describe('parser test', () => {
       fs.readFile('tests/file/parser/null-parser.yaml', 'utf8'),
       fs.readFile('tests/file/parser/concat-string-parser.yaml', 'utf8'),
       fs.readFile('tests/file/parser/string-parser.yaml', 'utf8'),
+      fs.readFile('tests/file/parser/array-parser.yaml', 'utf8'),
+      fs.readFile('tests/file/parser/array-value-parser.yaml', 'utf8'),
     ]);
 
     objectYaml = objectBuffer.toString();
@@ -33,6 +39,8 @@ describe('parser test', () => {
     nullYaml = nullBuffer.toString();
     concatStringYaml = concatStringBuffer.toString();
     stringYaml = stringBuffer.toString();
+    arrayYaml = arrayBuffer.toString();
+    arrayValueYaml = arrayValueBuffer.toString();
   });
 
   test('parser should parse object', async () => {
@@ -91,5 +99,25 @@ describe('parser test', () => {
 
     expect(result.string).toBe('it is string');
     expect(JSON.stringify(result)).toBe(`{"string":"it is string"}`);
+  });
+
+  test('parser should parse array', async () => {
+    const lexer = new Lexer(arrayYaml);
+    const parser = new Parser(lexer.tokenizer());
+    const result = parser.parse();
+
+    expect(JSON.stringify(result)).toBe(
+      `{"test":{"array":[1,2,3,null,true,false]}}`,
+    );
+  });
+
+  test('parser should parse array value', async () => {
+    const lexer = new Lexer(arrayValueYaml);
+    const parser = new Parser(lexer.tokenizer());
+    const result = parser.parse();
+
+    expect(JSON.stringify(result)).toBe(
+      `{"test":{"array":[1,2,3,null,true,false]}}`,
+    );
   });
 });

@@ -1,5 +1,5 @@
 import fs from 'fs/promises';
-import { Lexer, Token } from '../src/lexer';
+import { Lexer, Token } from '../src/Lexer';
 
 describe('lexer test', () => {
   let initYaml;
