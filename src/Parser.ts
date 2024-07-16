@@ -15,11 +15,11 @@ export class Parser {
       if (this.typeConverter.isObject(token.key, token.value)) {
         this.yamlGraph.addNode(token);
       } else if (this.typeConverter.isValue(token.key, token.value)) {
-        const str = this.typeConverter.concatString(
+        const value = this.typeConverter.concatString(
           this.yamlGraph.getLastedInsertedValue(),
           token,
         );
-        this.yamlGraph.addValueToLastNode(str);
+        this.yamlGraph.addValueToLastNode(value);
       } else if (this.typeConverter.isNumber(token.value)) {
         this.yamlGraph.addValue(
           this.typeConverter.toNumber(token.value),
