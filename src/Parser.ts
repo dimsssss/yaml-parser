@@ -14,6 +14,16 @@ export class Parser {
 
       if (this.typeConverter.isObject(token.key, token.value)) {
         this.yamlGraph.addNode(token);
+        // array: [1, 2, 3]
+      } else if (this.typeConverter.isArray(token.value)) {
+        this.yamlGraph.addValue(this.typeConverter.toArray(token.value), token);
+        // array:
+        // - 1
+        // - 2
+      } else if (this.typeConverter.isArrayValue(token.originalValue)) {
+        const value = this.typeConverter.toPrimitiveValue(token.originalValue);
+        this.yamlGraph.changeLastNodeToArray();
+        this.yamlGraph.addArrayValue(value);
       } else if (this.typeConverter.isValue(token.key, token.value)) {
         const value = this.typeConverter.concatString(
           this.yamlGraph.getLastedInsertedValue(),
