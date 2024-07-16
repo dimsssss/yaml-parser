@@ -1,6 +1,6 @@
 import fs from 'fs/promises';
-import { Lexer } from '../src/lexer';
-import { Parser } from '../src/parser';
+import { Lexer } from '../src/Lexer';
+import { Parser } from '../src/Parser';
 
 describe('parser test', () => {
   let objectYaml;

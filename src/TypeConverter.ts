@@ -1,4 +1,4 @@
-import { Token } from './lexer';
+import { Token } from './Lexer';
 
 export class TypeConverter {
   isObject(key: string, value: string) {

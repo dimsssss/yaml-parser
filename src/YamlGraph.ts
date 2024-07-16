@@ -1,4 +1,4 @@
-import { Token } from './lexer';
+import { Token } from './Lexer';
 
 export class YamlGraph {
   constructor(private depths: [[Record<string, any>, string, Token]]) {}

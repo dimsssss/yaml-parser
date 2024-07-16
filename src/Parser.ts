@@ -1,4 +1,4 @@
-import { Token } from './lexer';
+import { Token } from './Lexer';
 import { TypeConverter } from './TypeConverter';
 import { YamlGraph } from './YamlGraph';
 
