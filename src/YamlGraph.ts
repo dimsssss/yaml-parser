@@ -1,4 +1,4 @@
-import { Token } from './lexer';
+import { Token } from './Lexer';
 
 export class YamlGraph {
   constructor(private depths: [[Record<string, any>, string, Token]]) {}
@@ -49,6 +49,26 @@ export class YamlGraph {
   addValueToLastNode(value: any) {
     const [lastNode, lastNodeKey] = this.getLast();
     lastNode[lastNodeKey] = value;
+  }
+
+  changeLastNodeToArray() {
+    const [lastNode, lastKey, token] = this.getLast();
+
+    if (!Array.isArray(lastNode[lastKey])) {
+      this.depths.pop();
+      const prevNode = this.getLastNode();
+      prevNode[lastKey] = [];
+      this.depths.push([
+        Object.create(prevNode),
+        lastKey,
+        Object.create(token),
+      ]);
+    }
+  }
+
+  addArrayValue(value: any) {
+    const [lastNode, lastKey] = this.getLast();
+    lastNode[lastKey].push(value);
   }
 
   addValue(value: any, token: Token) {

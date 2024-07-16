@@ -1,4 +1,4 @@
-import { Token } from './lexer';
+import { Token } from './Lexer';
 import { TypeConverter } from './TypeConverter';
 import { YamlGraph } from './YamlGraph';
 
@@ -14,12 +14,22 @@ export class Parser {
 
       if (this.typeConverter.isObject(token.key, token.value)) {
         this.yamlGraph.addNode(token);
+        // array: [1, 2, 3]
+      } else if (this.typeConverter.isArray(token.value)) {
+        this.yamlGraph.addValue(this.typeConverter.toArray(token.value), token);
+        // array:
+        // - 1
+        // - 2
+      } else if (this.typeConverter.isArrayValue(token.originalValue)) {
+        const value = this.typeConverter.toPrimitiveValue(token.originalValue);
+        this.yamlGraph.changeLastNodeToArray();
+        this.yamlGraph.addArrayValue(value);
       } else if (this.typeConverter.isValue(token.key, token.value)) {
-        const str = this.typeConverter.concatString(
+        const value = this.typeConverter.concatString(
           this.yamlGraph.getLastedInsertedValue(),
           token,
         );
-        this.yamlGraph.addValueToLastNode(str);
+        this.yamlGraph.addValueToLastNode(value);
       } else if (this.typeConverter.isNumber(token.value)) {
         this.yamlGraph.addValue(
           this.typeConverter.toNumber(token.value),
