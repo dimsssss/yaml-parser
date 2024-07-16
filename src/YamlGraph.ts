@@ -51,6 +51,26 @@ export class YamlGraph {
     lastNode[lastNodeKey] = value;
   }
 
+  changeLastNodeToArray() {
+    const [lastNode, lastKey, token] = this.getLast();
+
+    if (!Array.isArray(lastNode[lastKey])) {
+      this.depths.pop();
+      const prevNode = this.getLastNode();
+      prevNode[lastKey] = [];
+      this.depths.push([
+        Object.create(prevNode),
+        lastKey,
+        Object.create(token),
+      ]);
+    }
+  }
+
+  addArrayValue(value: any) {
+    const [lastNode, lastKey] = this.getLast();
+    lastNode[lastKey].push(value);
+  }
+
   addValue(value: any, token: Token) {
     const lastNode = this.getLastNode();
     lastNode[token.key] = value;
