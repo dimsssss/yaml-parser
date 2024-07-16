@@ -31,6 +31,15 @@ export class TypeConverter {
     return value === '>';
   }
 
+  isArray(value: string) {
+    return value[0] == '[' && value[value.length - 1] === ']';
+  }
+
+  isArrayValue(value: string) {
+    const prefix = value.trim().split(' ');
+    return prefix[0] === '-';
+  }
+
   toNumber(value: string) {
     return Number(value);
   }
@@ -41,6 +50,30 @@ export class TypeConverter {
 
   toNull() {
     return null;
+  }
+
+  toArray(value: string) {
+    return value
+      .substring(1, value.length - 1)
+      .split(',')
+      .map(this.toPrimitiveValue.bind(this));
+  }
+
+  toPrimitiveValue(value: string) {
+    if (value.includes('-')) {
+      const [, arrayValue] = value.trim().split('-');
+      value = arrayValue.trim();
+    }
+
+    if (this.isBoolean(value)) {
+      return this.toBoolean(value);
+    } else if (this.isNumber(value)) {
+      return this.toNumber(value);
+    } else if (this.isNull(value)) {
+      return this.toNull();
+    }
+
+    throw new Error('not support value');
   }
 
   concatString(prevString: string, token: Token) {
